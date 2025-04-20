@@ -1,19 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Icon } from "@iconify/react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
     <div className="bg-pastel min-h-screen flex flex-col px-6 md:px-8 py-2 items-center justify-center gap-5 ">
-      <div className="flex items-center">
-        <Icon
-          icon="tabler:leaf"
-          width="30"
-          height="30"
-          style={{ color: "var(--accent)" }}
-        />
-        <div className="text-accent-primary font-bold text-3xl">NutriTrack</div>
-      </div>
+      <Image
+        src="./nutritracklogo.svg"
+        alt="leaf logo"
+        width={150}
+        height={100}
+      />
       <h1 className="text-title text-3xl md:text-4xl font-bold text-center">
         Track Your Nutrition Journey
       </h1>
