@@ -1,28 +1,46 @@
 import { create } from "zustand";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-};
-
-type AuthStore = {
-  accessToken: string | null;
-  user: User | null;
-  loading: boolean;
-  setAccessToken: (accessToken: string) => void;
-  setUser: (user: User | null) => void;
-  setLoading: (loading: boolean) => void;
-};
+import type { AuthStore } from "@/@types/auth";
+import { login, register, refresh, logout } from "@/api/auth";
 
 const useAuthStore = create<AuthStore>((set) => ({
-  accessToken: null,
   user: null,
   loading: false,
-  setUser: (user) => set({ user }),
-  setAccessToken: (accessToken) => set({ accessToken }),
-  setLoading: (loading) => set({ loading }),
+
+  loginUser: async (data) => {
+    set({ loading: true });
+    try {
+      const res = await login(data);
+      set({ user: res.user });
+    } finally {
+      set({ loading: false });
+    }
+  },
+  registerUser: async (data) => {
+    set({ loading: true });
+    try {
+      const res = await register(data);
+      await login({ email: res.user.email, password: data.password });
+      set({ user: res.user });
+    } finally {
+      set({ loading: false });
+    }
+  },
+  refreshSession: async () => {
+    set({ loading: true });
+    try {
+      await refresh();
+    } finally {
+      set({ loading: false });
+    }
+  },
+  logoutUser: async () => {
+    set({ loading: true });
+    try {
+      await logout();
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default useAuthStore;
