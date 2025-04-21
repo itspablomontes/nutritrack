@@ -13,6 +13,9 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import useAuthStore from "@/stores/useAuthStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const registerSchema = z
   .object({
@@ -49,8 +52,21 @@ export default function RegisterForm() {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof registerSchema>) => {
-    console.log("Form Data:", data);
+  const registerUser = useAuthStore((state) => state.registerUser);
+  const router = useRouter();
+
+  const handleSubmit = async (data: z.infer<typeof registerSchema>) => {
+    try {
+      await registerUser(data);
+      toast.success("You Successfully Registered");
+      router.push("/dashboard");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message ? error.message : "Failed to Register");
+      } else {
+        toast.error("Failed to Register");
+      }
+    }
     form.reset();
   };
 
