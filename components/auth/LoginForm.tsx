@@ -13,6 +13,9 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import useAuthStore from "@/stores/useAuthStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z
@@ -28,6 +31,9 @@ const loginSchema = z.object({
 });
 
 export default function LoginForm() {
+  const router = useRouter();
+  const loginUser = useAuthStore((state) => state.loginUser);
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     mode: "onBlur",
@@ -37,9 +43,18 @@ export default function LoginForm() {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof loginSchema>) => {
-    console.log("Form Data:", data);
-    form.reset();
+  const handleSubmit = async (data: z.infer<typeof loginSchema>) => {
+    try {
+      await loginUser(data);
+      toast.success("You Successfully logged in");
+      router.push("/dashboard");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message ? error.message : "Failed to login");
+      } else {
+        toast.error("Failed to login");
+      }
+    }
   };
   return (
     <div className="w-full md:max-w-[80%] text-2xl">
@@ -79,7 +94,7 @@ export default function LoginForm() {
             )}
           />
           <Button type="submit" className="bg-accent-primary font-bold">
-            Register
+            Login
           </Button>
         </form>
       </Form>
